@@ -491,7 +491,7 @@ abstract class OAuth2 extends AbstractAdapter implements AdapterInterface
         $response = $this->httpClient->request(
             $this->accessTokenUrl,
             $this->tokenExchangeMethod,
-          (in_array('application/x-www-form-urlencoded',  $this->tokenExchangeHeaders))? http_build_query($this->tokenExchangeParameters, '', '&') : $this->tokenExchangeParameters,
+            $this->tokenExchangeParameters,
             $this->tokenExchangeHeaders
         );
 

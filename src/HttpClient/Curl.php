@@ -115,6 +115,7 @@ class Curl implements HttpClientInterface
 
         if ('POST' == $method) {
             $this->curlOptions[CURLOPT_POST]       = true;
+            $parameters = (in_array('application/x-www-form-urlencoded', $headers))? http_build_query($parameters, '', '&') : $parameters;
             $this->curlOptions[CURLOPT_POSTFIELDS] = $parameters;
         }
 
