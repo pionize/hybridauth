@@ -47,38 +47,48 @@ class LinkedIn extends OAuth2
         $this->apiRequestHeaders = [
             'Authorization' => 'Bearer ' . $this->token('access_token')
         ];
+  
+        $this->tokenExchangeHeaders = [
+            'Content-Type' => 'application/x-www-form-urlencoded'
+        ];
     }
 
     /**
     * {@inheritdoc}
     */
-    public function getUserProfile()
-    {
-        $fields = [
-            'id', 'email-address', 'first-name', 'last-name', 'headline','location', 'industry',
-            'picture-url', 'public-profile-url',
-        ];
-
-        $response = $this->apiRequest('people/~:(' . implode(',', $this->fields) . ')?format=json');
-
-        $data = new Data\Collection($response);
-
-        if (! $data->exists('ID')) {
-            throw new UnexpectedValueException('Provider API returned an unexpected response.');
-        }
-
-        $userProfile = new User\Profile();
-
-        $userProfile->identifier  = $data->get('ID');
-        $userProfile->firstName   = $data->get('firstName');
-        $userProfile->lastName    = $data->get('lastName');
-        $userProfile->photoURL    = $data->get('pictureUrl');
-        $userProfile->profileURL  = $data->get('publicProfileUrl');
-        $userProfile->email       = $data->get('headline');
-        $userProfile->bio         = $data->get('language');
-
-        $userProfile->displayName = trim($userProfile->firstName . ' ' . $userProfile->lastName);
-
-        return $userProfile;
-    }
+  public function getUserProfile()
+  {
+      $this->fields = [
+        'id', 'email-address', 'first-name', 'last-name', 'headline','location', 'industry',
+        'picture-url', 'public-profile-url',
+      ];
+      
+      $response = $this->apiRequest('people/~:(' . implode(',', $this->fields) . ')?format=json');
+      
+      $data = new Data\Collection($response);
+      
+      if (! $data->exists('id')) {
+        throw new UnexpectedValueException('Provider API returned an unexpected response.');
+      }
+      
+      $tmp = $data->get('location');
+      $location = explode(',', $tmp->name);
+      $city = $location[1];
+      $userProfile = new User\Profile();
+      
+      $userProfile->identifier  = $data->get('id');
+      $userProfile->firstName   = $data->get('firstName');
+      $userProfile->lastName    = $data->get('lastName');
+      $userProfile->photoURL    = $data->get('pictureUrl');
+      $userProfile->profileURL  = $data->get('publicProfileUrl');
+      $userProfile->description       = $data->get('headline');
+      //$userProfile->bio         = $data->get('language');
+      $userProfile->city        = $city;
+      $userProfile->email       = $data->get('emailAddress');
+      $userProfile->emailVerified       = $data->get('emailAddress');
+      
+      $userProfile->displayName = trim($userProfile->firstName . ' ' . $userProfile->lastName);
+      
+      return $userProfile;
+  }
 }
