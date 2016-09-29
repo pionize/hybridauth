@@ -72,8 +72,11 @@ class LinkedIn extends OAuth2
       }
       
       $tmp = $data->get('location');
+      $city = $data->get('location');
       $location = explode(',', $tmp->name);
-      $city = $location[1];
+      if (count($location) > 1) {
+        $city = $location[1];
+      }
       $userProfile = new User\Profile();
       
       $userProfile->identifier  = $data->get('id');
